@@ -15,21 +15,14 @@
 </main>
 <script>
 (()=>{const c=document.querySelector('#game'),x=c.getContext('2d'),overlay=document.querySelector('#overlay'),scoreEl=document.querySelector('#score'),streakEl=document.querySelector('#streak'),bestEl=document.querySelector('#best'),title=document.querySelector('#title'),msg=document.querySelector('#message'),label=document.querySelector('#label'),start=document.querySelector('#start');
-const W=900,H=520,ground=455,ball={x:145,y:ground-17,r:17,vx:0,vy:0},hoop={x:690,y:205,w:82,dir:1};let score=0,streak=0,best=0,shots=0,active=false,drag=false,aim=null,scored=false,hoopSpeed=0,last=0,particles=[],messageTimer=0;
+const W=900,H=520,ground=455,ball={x:450,y:ground-18,r:18,vx:0,vy:0},hoop={x:450,y:175,w:110,dir:1};let score=0,streak=0,best=0,shots=0,active=false,drag=false,aim=null,scored=false,hoopSpeed=0,last=0,particles=[],messageTimer=0;
 try{best=+(localStorage.getItem('gv-hoop-best')||0)}catch(e){}bestEl.textContent=best;
-function reset(){score=0;streak=0;shots=0;ball.x=210;ball.y=ground-17;ball.vx=ball.vy=0;hoop.x=730;hoop.dir=1;particles=[];updateUI()}
+function reset(){score=0;streak=0;shots=0;ball.x=450;ball.y=ground-18;ball.vx=ball.vy=0;hoop.x=450;hoop.dir=1;particles=[];updateUI()}
 function updateUI(){scoreEl.textContent=score;streakEl.textContent=streak+'/3';bestEl.textContent=best}
 function startGame(){reset();active=true;overlay.classList.add('hide');last=performance.now();requestAnimationFrame(loop)}
 function finish(){active=false;label.textContent='RUN COMPLETE';title.textContent='NICE SHOOTING!';msg.textContent='Final score: '+score+'. Best score: '+best+'. Want another round?';start.textContent='PLAY AGAIN';overlay.classList.remove('hide')}
-function drawCourt(){let g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#315f9b');g.addColorStop(1,'#173b70');x.fillStyle=g;x.fillRect(0,0,W,H);
-// painted court texture
-for(let i=0;i<90;i++){x.fillStyle=i%2?'#ffffff08':'#f7a47b12';x.fillRect((i*137)%W,(i*71)%H,70,3)}
-x.strokeStyle='#ffe7cf';x.lineWidth=5;x.strokeRect(18,18,W-36,H-36);x.beginPath();x.moveTo(20,82);x.lineTo(880,82);x.moveTo(20,438);x.lineTo(880,438);x.stroke();
-x.fillStyle='#f16b43';x.fillRect(515,160,385,200);x.strokeStyle='#ffe7cf';x.lineWidth=5;x.strokeRect(515,160,385,200);x.beginPath();x.ellipse(515,260,145,145,0,-Math.PI/2,Math.PI/2);x.stroke();x.beginPath();x.arc(515,260,75,-Math.PI/2,Math.PI/2);x.setLineDash([12,10]);x.stroke();x.setLineDash([]);
-}
-function drawHoop(){// backboard and rim
-x.fillStyle='#fff0df';x.fillRect(hoop.x+72,hoop.y-65,9,90);x.strokeStyle='#fff0df';x.lineWidth=5;x.strokeRect(hoop.x+35,hoop.y-65,48,35);
-x.strokeStyle='#ff7548';x.lineWidth=8;x.beginPath();x.ellipse(hoop.x,hoop.y,42,9,0,0,Math.PI*2);x.stroke();x.strokeStyle='#fff0df';x.lineWidth=2;x.beginPath();x.moveTo(hoop.x-35,hoop.y+4);x.lineTo(hoop.x-22,hoop.y+48);x.lineTo(hoop.x+22,hoop.y+48);x.lineTo(hoop.x+35,hoop.y+4);x.stroke();for(let i=-2;i<=2;i++){x.beginPath();x.moveTo(hoop.x+i*13,hoop.y+6);x.lineTo(hoop.x+i*7,hoop.y+45);x.stroke()}}
+function drawCourt(){let g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#183c70');g.addColorStop(.58,'#315f9b');g.addColorStop(1,'#e96e43');x.fillStyle=g;x.fillRect(0,0,W,H);for(let i=0;i<7;i++){x.fillStyle='#ffffff0b';x.fillRect(35+i*125,0,2,H)}x.fillStyle='#0d2850aa';x.fillRect(0,0,W,115);x.fillStyle='#f16b43';x.fillRect(0,350,W,105);x.strokeStyle='#ffe7cf';x.lineWidth=5;x.beginPath();x.moveTo(0,350);x.lineTo(W,350);x.stroke();x.strokeStyle='#fff0df88';x.lineWidth=4;x.beginPath();x.ellipse(450,455,270,90,0,Math.PI,Math.PI*2);x.stroke();x.fillStyle='#f5d9b9';x.fillRect(0,ground,W,H-ground);x.strokeStyle='#fff0df';x.lineWidth=4;x.beginPath();x.moveTo(0,ground);x.lineTo(W,ground);x.stroke()}
+function drawHoop(){x.shadowColor='#081a35';x.shadowBlur=15;x.fillStyle='#e8f2ff';x.fillRect(hoop.x-88,hoop.y-105,176,100);x.shadowBlur=0;x.strokeStyle='#fff';x.lineWidth=5;x.strokeRect(hoop.x-88,hoop.y-105,176,100);x.strokeStyle='#f16b43';x.lineWidth=5;x.strokeRect(hoop.x-35,hoop.y-65,70,45);x.strokeStyle='#ffb06c';x.lineWidth=10;x.beginPath();x.ellipse(hoop.x,hoop.y,55,13,0,0,Math.PI*2);x.stroke();x.strokeStyle='#fff0df';x.lineWidth=2;for(let i=-4;i<=4;i++){x.beginPath();x.moveTo(hoop.x+i*12,hoop.y+8);x.lineTo(hoop.x+i*8,hoop.y+62);x.stroke()}x.beginPath();x.moveTo(hoop.x-52,hoop.y+8);x.lineTo(hoop.x-34,hoop.y+62);x.lineTo(hoop.x+34,hoop.y+62);x.lineTo(hoop.x+52,hoop.y+8);x.stroke()}
 function drawBall(){let grad=x.createRadialGradient(ball.x-6,ball.y-7,2,ball.x,ball.y,ball.r);grad.addColorStop(0,'#ffca70');grad.addColorStop(1,'#d94c22');x.fillStyle=grad;x.beginPath();x.arc(ball.x,ball.y,ball.r,0,Math.PI*2);x.fill();x.strokeStyle='#542719';x.lineWidth=2;x.beginPath();x.arc(ball.x,ball.y,ball.r*.72,-1.1,1.1);x.moveTo(ball.x-ball.r,ball.y);x.quadraticCurveTo(ball.x,ball.y-7,ball.x+ball.r,ball.y);x.moveTo(ball.x,ball.y-ball.r);x.quadraticCurveTo(ball.x+8,ball.y,ball.x,ball.y+ball.r);x.stroke()}
 function draw(){drawCourt();drawHoop();x.fillStyle='#f5d9b9';x.fillRect(0,ground,W,H-ground);x.strokeStyle='#fff0df';x.lineWidth=4;x.beginPath();x.moveTo(0,ground);x.lineTo(W,ground);x.stroke();
 if(drag&&aim){x.setLineDash([8,8]);x.strokeStyle='#fff';x.lineWidth=3;x.beginPath();x.moveTo(ball.x,ball.y);x.lineTo(ball.x+(ball.x-aim.x)*1.8,ball.y+(ball.y-aim.y)*1.8);x.stroke();x.setLineDash([])}
@@ -39,12 +32,12 @@ if(score>=20)x.fillStyle='#fff';if(score>=20){x.font='900 13px system-ui';x.fill
 function pointer(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
 c.addEventListener('pointerdown',e=>{if(!active)return;let p=pointer(e);if(Math.hypot(p.x-ball.x,p.y-ball.y)<55){drag=true;aim=p;c.setPointerCapture(e.pointerId)}});
 c.addEventListener('pointermove',e=>{if(drag)aim=pointer(e)});
-c.addEventListener('pointerup',e=>{if(!drag)return;let p=pointer(e),dx=ball.x-p.x,dy=ball.y-p.y;drag=false;aim=null;const pull=Math.hypot(dx,dy);if(dy>8&&pull>12){const scale=Math.min(1,190/pull);const px=dx*scale,py=dy*scale;ball.vx=Math.max(260,Math.min(760,px*3.45));ball.vy=-Math.max(300,Math.min(780,py*3.45));shots++;scored=false}});
+c.addEventListener('pointerup',e=>{if(!drag)return;let p=pointer(e),dx=ball.x-p.x,dy=ball.y-p.y;drag=false;aim=null;if(dy>10&&Math.hypot(dx,dy)>14){ball.vx=Math.max(-420,Math.min(420,dx*2.0));ball.vy=-Math.max(650,Math.min(900,520+dy*1.35));shots++;scored=false}});
 function scoreBasket(){if(scored)return;scored=true;let points=streak>=3?2:1;score+=points;streak++;if(score>best){best=score;try{localStorage.setItem('gv-hoop-best',best)}catch(e){}}for(let i=0;i<18;i++)particles.push({x:hoop.x,y:hoop.y,vx:(Math.random()-.5)*220,vy:-Math.random()*220,life:.7});updateUI();ball.vx=ball.vy=0;ball.x=210;ball.y=ground-17}
 function miss(){streak=0;updateUI();ball.vx=ball.vy=0;ball.x=210;ball.y=ground-17}
-function loop(now){if(!active)return;let dt=Math.min((now-last)/1000,.03);last=now;let level=Math.floor(score/20);hoopSpeed=level?22+level*15:0;if(hoopSpeed){hoop.x+=hoop.dir*hoopSpeed*dt;if(hoop.x>790){hoop.x=790;hoop.dir=-1}if(hoop.x<650){hoop.x=650;hoop.dir=1}}
-if(ball.vx||ball.vy){let prevY=ball.y;ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;ball.vy+=900*dt;ball.vx*=.999;
-if(!scored&&ball.vy>0&&prevY<hoop.y&&ball.y>=hoop.y&&ball.x>hoop.x-35&&ball.x<hoop.x+35){scoreBasket()}
+function loop(now){if(!active)return;let dt=Math.min((now-last)/1000,.03);last=now;let level=Math.floor(score/20);hoopSpeed=level?12+level*10:0;if(hoopSpeed){hoop.x+=hoop.dir*hoopSpeed*dt;if(hoop.x>650){hoop.x=650;hoop.dir=-1}if(hoop.x<250){hoop.x=250;hoop.dir=1}}
+if(ball.vx||ball.vy){let prevY=ball.y;ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;ball.vy+=1250*dt;ball.vx*=.999;
+if(!scored&&ball.vy<0&&prevY>hoop.y&&ball.y<=hoop.y&&ball.x>hoop.x-43&&ball.x<hoop.x+43){scoreBasket()}
 if(ball.y>ground-ball.r||ball.x>W+40||ball.x<-40){miss()}}
 particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=300*dt;p.life-=dt});particles=particles.filter(p=>p.life>0);draw();requestAnimationFrame(loop)}
 start.addEventListener('click',startGame);draw();
