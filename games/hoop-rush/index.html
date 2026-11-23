@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#142c58"><title>HOOP RUSH — GAMEVERSE</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#10182b;color:#fff;font-family:Inter,system-ui,sans-serif}body{padding:18px;display:grid;place-items:center}.shell{width:min(1000px,100%)}header,.heading,.help,.bottom{display:flex;justify-content:space-between;align-items:center;gap:14px}header{margin-bottom:18px}.brand{font-weight:950;letter-spacing:.1em}.brand span{color:#a5f3fc}.back{color:#e2e8f0;text-decoration:none;font-size:11px;border:1px solid #ffffff45;padding:9px 12px;border-radius:6px}.heading{align-items:end;margin-bottom:14px}h1{font-size:clamp(32px,6vw,52px);line-height:1;margin:0;letter-spacing:-.07em}.kicker{font-size:9px;letter-spacing:.2em;color:#a5f3fc;font-weight:900;margin-bottom:7px}.scores{display:flex;gap:8px}.scores div{background:#0d1b35cc;border:1px solid #ffffff38;border-radius:8px;padding:8px 12px;min-width:75px;text-align:center}.scores small{display:block;color:#cbd5e1;font-size:8px;letter-spacing:.15em}.scores b{font-size:22px;font-variant-numeric:tabular-nums}.stage{position:relative;overflow:hidden;border:2px solid #f5d9b9;border-radius:10px;box-shadow:0 20px 60px #0008;background:#234b82}canvas{width:100%;height:auto;display:block;touch-action:none}.overlay{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:20px;background:#07152dcc}.overlay.hide{display:none}.dialog{max-width:390px;padding:25px 30px;border:1px solid #ffffff65;border-radius:12px;background:#0c1b36eF;box-shadow:0 16px 50px #0008}.dialog small{color:#a5f3fc;letter-spacing:.2em;font-weight:900}.dialog h2{font-size:clamp(30px,5vw,44px);margin:10px 0;letter-spacing:-.06em}.dialog p{color:#dbeafe;font-size:13px;line-height:1.6}.btn{border:0;border-radius:7px;background:linear-gradient(100deg,#fbbf24,#fb923c);color:#20120a;padding:13px 25px;font-weight:950;letter-spacing:.1em;cursor:pointer}.help{flex-wrap:wrap;color:#cbd5e1;font-size:11px;padding:13px 2px}.help b{color:#fff}.bottom{border-top:1px solid #ffffff2b;padding-top:14px;margin-top:18px;color:#94a3b8;font-size:9px}@media(max-width:560px){body{padding:10px}.scores{gap:4px}.scores div{min-width:59px;padding:7px}.scores b{font-size:18px}.help{font-size:10px}.bottom{font-size:8px}}
+</style></head>
+<body><main class="shell">
+<header><div class="brand">GAMEVERSE<span>.</span></div><a class="back" href="../../index.html#games">← BACK TO GAMEVERSE</a></header>
+<div class="heading"><div><div class="kicker">GAMEVERSE ORIGINAL · 002</div><h1>HOOP RUSH</h1></div><div class="scores"><div><small>SCORE</small><b id="score">0</b></div><div><small>STREAK</small><b id="streak">0/3</b></div><div><small>BEST</small><b id="best">0</b></div></div></div>
+<section class="stage"><canvas id="game" width="900" height="520" aria-label="Basketball shooting game"></canvas><div class="overlay" id="overlay"><div class="dialog"><small id="label">GAMEVERSE ARCADE</small><h2 id="title">MAKE YOUR SHOT.</h2><p id="message">Drag the ball backwards to aim, then release to shoot. Score three baskets in a row to double your next points. Every 20 points, the hoop starts moving faster.</p><button class="btn" id="start">START SHOOTING</button></div></div></section>
+<div class="help"><span><b>DRAG + RELEASE</b> to shoot</span><span><b>3 IN A ROW</b> doubles the next basket</span><span><b>20 / 40 / 60...</b> hoop gets faster</span></div>
+<footer class="bottom"><span>© GAMEVERSE · YOUR UNIVERSE. YOUR GAMES.</span><span>FIRST PLAYABLE BUILD · 0.1</span></footer>
+</main>
+<script>
+(()=>{const c=document.querySelector('#game'),x=c.getContext('2d'),overlay=document.querySelector('#overlay'),scoreEl=document.querySelector('#score'),streakEl=document.querySelector('#streak'),bestEl=document.querySelector('#best'),title=document.querySelector('#title'),msg=document.querySelector('#message'),label=document.querySelector('#label'),start=document.querySelector('#start');
+const W=900,H=520,ground=455,ball={x:145,y:ground-17,r:17,vx:0,vy:0},hoop={x:690,y:205,w:82,dir:1};let score=0,streak=0,best=0,shots=0,active=false,drag=false,aim=null,scored=false,hoopSpeed=0,last=0,particles=[],messageTimer=0;
+try{best=+(localStorage.getItem('gv-hoop-best')||0)}catch(e){}bestEl.textContent=best;
+function reset(){score=0;streak=0;shots=0;ball.x=145;ball.y=ground-17;ball.vx=ball.vy=0;hoop.x=690;hoop.dir=1;particles=[];updateUI()}
+function updateUI(){scoreEl.textContent=score;streakEl.textContent=streak+'/3';bestEl.textContent=best}
+function startGame(){reset();active=true;overlay.classList.add('hide');last=performance.now();requestAnimationFrame(loop)}
+function finish(){active=false;label.textContent='RUN COMPLETE';title.textContent='NICE SHOOTING!';msg.textContent='Final score: '+score+'. Best score: '+best+'. Want another round?';start.textContent='PLAY AGAIN';overlay.classList.remove('hide')}
+function drawCourt(){let g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#315f9b');g.addColorStop(1,'#173b70');x.fillStyle=g;x.fillRect(0,0,W,H);
+// painted court texture
+for(let i=0;i<90;i++){x.fillStyle=i%2?'#ffffff08':'#f7a47b12';x.fillRect((i*137)%W,(i*71)%H,70,3)}
+x.strokeStyle='#ffe7cf';x.lineWidth=5;x.strokeRect(18,18,W-36,H-36);x.beginPath();x.moveTo(20,82);x.lineTo(880,82);x.moveTo(20,438);x.lineTo(880,438);x.stroke();
+x.fillStyle='#f16b43';x.fillRect(510,160,390,200);x.strokeStyle='#ffe7cf';x.lineWidth=5;x.strokeRect(510,160,390,200);x.beginPath();x.ellipse(510,260,145,145,0,-Math.PI/2,Math.PI/2);x.stroke();x.beginPath();x.arc(510,260,75,-Math.PI/2,Math.PI/2);x.setLineDash([12,10]);x.stroke();x.setLineDash([]);
+}
+function drawHoop(){// backboard and rim
+x.fillStyle='#fff0df';x.fillRect(hoop.x+72,hoop.y-65,9,90);x.strokeStyle='#fff0df';x.lineWidth=5;x.strokeRect(hoop.x+35,hoop.y-65,48,35);
+x.strokeStyle='#ff7548';x.lineWidth=8;x.beginPath();x.ellipse(hoop.x,hoop.y,42,9,0,0,Math.PI*2);x.stroke();x.strokeStyle='#fff0df';x.lineWidth=2;x.beginPath();x.moveTo(hoop.x-35,hoop.y+4);x.lineTo(hoop.x-22,hoop.y+48);x.lineTo(hoop.x+22,hoop.y+48);x.lineTo(hoop.x+35,hoop.y+4);x.stroke();for(let i=-2;i<=2;i++){x.beginPath();x.moveTo(hoop.x+i*13,hoop.y+6);x.lineTo(hoop.x+i*7,hoop.y+45);x.stroke()}}
+function drawBall(){let grad=x.createRadialGradient(ball.x-6,ball.y-7,2,ball.x,ball.y,ball.r);grad.addColorStop(0,'#ffca70');grad.addColorStop(1,'#d94c22');x.fillStyle=grad;x.beginPath();x.arc(ball.x,ball.y,ball.r,0,Math.PI*2);x.fill();x.strokeStyle='#542719';x.lineWidth=2;x.beginPath();x.arc(ball.x,ball.y,ball.r*.72,-1.1,1.1);x.moveTo(ball.x-ball.r,ball.y);x.quadraticCurveTo(ball.x,ball.y-7,ball.x+ball.r,ball.y);x.moveTo(ball.x,ball.y-ball.r);x.quadraticCurveTo(ball.x+8,ball.y,ball.x,ball.y+ball.r);x.stroke()}
+function draw(){drawCourt();drawHoop();x.fillStyle='#f5d9b9';x.fillRect(0,ground,W,H-ground);x.strokeStyle='#fff0df';x.lineWidth=4;x.beginPath();x.moveTo(0,ground);x.lineTo(W,ground);x.stroke();
+if(drag&&aim){x.setLineDash([8,8]);x.strokeStyle='#fff';x.lineWidth=3;x.beginPath();x.moveTo(ball.x,ball.y);x.lineTo(ball.x+(ball.x-aim.x)*1.8,ball.y+(ball.y-aim.y)*1.8);x.stroke();x.setLineDash([])}
+drawBall();for(const p of particles){x.globalAlpha=Math.max(0,p.life/.7);x.fillStyle='#ffe08a';x.beginPath();x.arc(p.x,p.y,4,0,Math.PI*2);x.fill()}x.globalAlpha=1;
+if(score>=20)x.fillStyle='#fff';if(score>=20){x.font='900 13px system-ui';x.fillText('MOVING HOOP · LEVEL '+Math.floor(score/20),24,48)}
+}
+function pointer(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
+c.addEventListener('pointerdown',e=>{if(!active)return;let p=pointer(e);if(Math.hypot(p.x-ball.x,p.y-ball.y)<55){drag=true;aim=p;c.setPointerCapture(e.pointerId)}});
+c.addEventListener('pointermove',e=>{if(drag)aim=pointer(e)});
+c.addEventListener('pointerup',e=>{if(!drag)return;let p=pointer(e),dx=ball.x-p.x,dy=ball.y-p.y;drag=false;aim=null;if(dy>4){ball.vx=Math.max(260,Math.min(850,dx*3.1));ball.vy=-Math.max(380,Math.min(920,dy*3.3));shots++;scored=false}});
+function scoreBasket(){if(scored)return;scored=true;let points=streak>=2?2:1;score+=points;streak++;if(score>best){best=score;try{localStorage.setItem('gv-hoop-best',best)}catch(e){}}for(let i=0;i<18;i++)particles.push({x:hoop.x,y:hoop.y,vx:(Math.random()-.5)*220,vy:-Math.random()*220,life:.7});updateUI();ball.vx=ball.vy=0;ball.x=145;ball.y=ground-17}
+function miss(){streak=0;updateUI();ball.vx=ball.vy=0;ball.x=145;ball.y=ground-17}
+function loop(now){if(!active)return;let dt=Math.min((now-last)/1000,.03);last=now;let level=Math.floor(score/20);hoopSpeed=level?22+level*15:0;if(hoopSpeed){hoop.x+=hoop.dir*hoopSpeed*dt;if(hoop.x>760){hoop.x=760;hoop.dir=-1}if(hoop.x<570){hoop.x=570;hoop.dir=1}}
+if(ball.vx||ball.vy){let prevY=ball.y;ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;ball.vy+=900*dt;ball.vx*=.999;
+if(!scored&&ball.vy>0&&prevY<hoop.y&&ball.y>=hoop.y&&ball.x>hoop.x-35&&ball.x<hoop.x+35){scoreBasket()}
+if(ball.y>ground-ball.r||ball.x>W+40||ball.x<-40){miss()}}
+particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=300*dt;p.life-=dt});particles=particles.filter(p=>p.life>0);draw();requestAnimationFrame(loop)}
+start.addEventListener('click',startGame);draw();
+})();</script></body></html>
