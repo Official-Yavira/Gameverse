@@ -40,7 +40,7 @@ function pointer(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left
 c.addEventListener('pointerdown',e=>{if(!active)return;let p=pointer(e);if(Math.hypot(p.x-ball.x,p.y-ball.y)<55){drag=true;aim=p;c.setPointerCapture(e.pointerId)}});
 c.addEventListener('pointermove',e=>{if(drag)aim=pointer(e)});
 c.addEventListener('pointerup',e=>{if(!drag)return;let p=pointer(e),dx=ball.x-p.x,dy=ball.y-p.y;drag=false;aim=null;if(dy>4){ball.vx=Math.max(260,Math.min(850,dx*3.1));ball.vy=-Math.max(380,Math.min(920,dy*3.3));shots++;scored=false}});
-function scoreBasket(){if(scored)return;scored=true;let points=streak>=2?2:1;score+=points;streak++;if(score>best){best=score;try{localStorage.setItem('gv-hoop-best',best)}catch(e){}}for(let i=0;i<18;i++)particles.push({x:hoop.x,y:hoop.y,vx:(Math.random()-.5)*220,vy:-Math.random()*220,life:.7});updateUI();ball.vx=ball.vy=0;ball.x=145;ball.y=ground-17}
+function scoreBasket(){if(scored)return;scored=true;let points=streak>=3?2:1;score+=points;streak++;if(score>best){best=score;try{localStorage.setItem('gv-hoop-best',best)}catch(e){}}for(let i=0;i<18;i++)particles.push({x:hoop.x,y:hoop.y,vx:(Math.random()-.5)*220,vy:-Math.random()*220,life:.7});updateUI();ball.vx=ball.vy=0;ball.x=145;ball.y=ground-17}
 function miss(){streak=0;updateUI();ball.vx=ball.vy=0;ball.x=145;ball.y=ground-17}
 function loop(now){if(!active)return;let dt=Math.min((now-last)/1000,.03);last=now;let level=Math.floor(score/20);hoopSpeed=level?22+level*15:0;if(hoopSpeed){hoop.x+=hoop.dir*hoopSpeed*dt;if(hoop.x>760){hoop.x=760;hoop.dir=-1}if(hoop.x<570){hoop.x=570;hoop.dir=1}}
 if(ball.vx||ball.vy){let prevY=ball.y;ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;ball.vy+=900*dt;ball.vx*=.999;
