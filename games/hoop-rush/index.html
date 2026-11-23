@@ -9,8 +9,8 @@
 <body><main class="shell">
 <header><div class="brand">GAMEVERSE<span>.</span></div><a class="back" href="../../index.html#games">← BACK TO GAMEVERSE</a></header>
 <div class="heading"><div><div class="kicker">GAMEVERSE ORIGINAL · 002</div><h1>HOOP RUSH</h1></div><div class="scores"><div><small>SCORE</small><b id="score">0</b></div><div><small>STREAK</small><b id="streak">0/3</b></div><div><small>BEST</small><b id="best">0</b></div></div></div>
-<section class="stage"><canvas id="game" width="900" height="520" aria-label="Basketball shooting game"></canvas><div class="overlay" id="overlay"><div class="dialog"><small id="label">GAMEVERSE ARCADE</small><h2 id="title">MAKE YOUR SHOT.</h2><p id="message">Pull the ball down to aim and build power, then release to shoot. Pull slightly left or right to adjust your direction. Score three baskets in a row to double your next points. Every 20 points, the hoop starts moving faster.</p><button class="btn" id="start">START SHOOTING</button></div></div></section>
-<div class="help"><span><b>PULL DOWN + RELEASE</b> to shoot</span><span><b>3 IN A ROW</b> doubles the next basket</span><span><b>20 / 40 / 60...</b> hoop gets faster</span></div>
+<section class="stage"><canvas id="game" width="900" height="520" aria-label="Basketball shooting game"></canvas><div class="overlay" id="overlay"><div class="dialog"><small id="label">GAMEVERSE ARCADE</small><h2 id="title">MAKE YOUR SHOT.</h2><p id="message">Pull the ball down to aim and build power, then release to shoot. Pull slightly left or right to adjust your direction. Score three baskets in a row to double your next points. Every 5 points, the hoop moves faster.</p><button class="btn" id="start">START SHOOTING</button></div></div></section>
+<div class="help"><span><b>PULL DOWN + RELEASE</b> to shoot</span><span><b>3 IN A ROW</b> doubles the next basket</span><span><b>5 / 10 / 15 / 20...</b> hoop gets faster</span></div>
 <footer class="bottom"><span>© GAMEVERSE · YOUR UNIVERSE. YOUR GAMES.</span><span>FIRST PLAYABLE BUILD · 0.1</span></footer>
 </main>
 <script>
@@ -27,7 +27,7 @@ function drawBall(){let grad=x.createRadialGradient(ball.x-6,ball.y-7,2,ball.x,b
 function draw(){drawCourt();drawHoop();x.fillStyle='#f5d9b9';x.fillRect(0,ground,W,H-ground);x.strokeStyle='#fff0df';x.lineWidth=4;x.beginPath();x.moveTo(0,ground);x.lineTo(W,ground);x.stroke();
 if(drag&&aim){x.setLineDash([8,8]);x.strokeStyle='#fff';x.lineWidth=3;x.beginPath();x.moveTo(ball.x,ball.y);x.lineTo(ball.x+(ball.x-aim.x)*1.25,ball.y-(aim.y-ball.y)*1.25);x.stroke();x.setLineDash([])}
 drawBall();for(const p of particles){x.globalAlpha=Math.max(0,p.life/.7);x.fillStyle='#ffe08a';x.beginPath();x.arc(p.x,p.y,4,0,Math.PI*2);x.fill()}x.globalAlpha=1;
-if(score>=20)x.fillStyle='#fff';if(score>=20){x.font='900 13px system-ui';x.fillText('MOVING HOOP · LEVEL '+Math.floor(score/20),24,48)}
+if(score>=20)x.fillStyle='#fff';if(score>=20){x.font='900 13px system-ui';x.fillText('MOVING HOOP · LEVEL '+Math.floor(score/5),24,48)}
 }
 function pointer(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
 c.addEventListener('pointerdown',e=>{if(!active)return;let p=pointer(e);if(Math.hypot(p.x-ball.x,p.y-ball.y)<55){drag=true;aim=p;c.setPointerCapture(e.pointerId)}});
@@ -35,7 +35,7 @@ c.addEventListener('pointermove',e=>{if(drag)aim=pointer(e)});
 c.addEventListener('pointerup',e=>{if(!drag)return;let p=pointer(e),dx=ball.x-p.x,dy=p.y-ball.y;drag=false;aim=null;if(dy>10&&Math.hypot(dx,dy)>14){const pull=Math.min(220,dy);ball.vx=Math.max(-360,Math.min(360,dx*1.55));ball.vy=-Math.max(850,Math.min(1120,760+pull*1.65));shots++;scored=false}});
 function scoreBasket(){if(scored)return;scored=true;let points=streak>=3?2:1;score+=points;streak++;if(score>best){best=score;try{localStorage.setItem('gv-hoop-best',best)}catch(e){}}for(let i=0;i<18;i++)particles.push({x:hoop.x,y:hoop.y,vx:(Math.random()-.5)*220,vy:-Math.random()*220,life:.7});updateUI();ball.vx=ball.vy=0;ball.x=450;ball.y=ground-18}
 function miss(){streak=0;updateUI();ball.vx=ball.vy=0;ball.x=450;ball.y=ground-18}
-function loop(now){if(!active)return;let dt=Math.min((now-last)/1000,.03);last=now;let level=Math.floor(score/20);hoopSpeed=level?12+level*10:0;if(hoopSpeed){hoop.x+=hoop.dir*hoopSpeed*dt;if(hoop.x>650){hoop.x=650;hoop.dir=-1}if(hoop.x<250){hoop.x=250;hoop.dir=1}}
+function loop(now){if(!active)return;let dt=Math.min((now-last)/1000,.03);last=now;let level=Math.floor(score/5);hoopSpeed=level?8+level*7:0;if(hoopSpeed){hoop.x+=hoop.dir*hoopSpeed*dt;if(hoop.x>650){hoop.x=650;hoop.dir=-1}if(hoop.x<250){hoop.x=250;hoop.dir=1}}
 if(ball.vx||ball.vy){let prevY=ball.y,oldVy=ball.vy;ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;ball.vy+=1250*dt;ball.vx*=.999;
 if(!scored&&oldVy>0&&prevY<hoop.y&&ball.y>=hoop.y&&ball.x>hoop.x-38&&ball.x<hoop.x+38){scoreBasket()}
 if(ball.y>ground-ball.r||ball.x>W+40||ball.x<-40){miss()}}
