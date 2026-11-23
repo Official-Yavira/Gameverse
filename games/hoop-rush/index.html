@@ -17,7 +17,7 @@
 (()=>{const c=document.querySelector('#game'),x=c.getContext('2d'),overlay=document.querySelector('#overlay'),scoreEl=document.querySelector('#score'),streakEl=document.querySelector('#streak'),bestEl=document.querySelector('#best'),title=document.querySelector('#title'),msg=document.querySelector('#message'),label=document.querySelector('#label'),start=document.querySelector('#start');
 const W=900,H=520,ground=455,ball={x:145,y:ground-17,r:17,vx:0,vy:0},hoop={x:690,y:205,w:82,dir:1};let score=0,streak=0,best=0,shots=0,active=false,drag=false,aim=null,scored=false,hoopSpeed=0,last=0,particles=[],messageTimer=0;
 try{best=+(localStorage.getItem('gv-hoop-best')||0)}catch(e){}bestEl.textContent=best;
-function reset(){score=0;streak=0;shots=0;ball.x=145;ball.y=ground-17;ball.vx=ball.vy=0;hoop.x=690;hoop.dir=1;particles=[];updateUI()}
+function reset(){score=0;streak=0;shots=0;ball.x=210;ball.y=ground-17;ball.vx=ball.vy=0;hoop.x=730;hoop.dir=1;particles=[];updateUI()}
 function updateUI(){scoreEl.textContent=score;streakEl.textContent=streak+'/3';bestEl.textContent=best}
 function startGame(){reset();active=true;overlay.classList.add('hide');last=performance.now();requestAnimationFrame(loop)}
 function finish(){active=false;label.textContent='RUN COMPLETE';title.textContent='NICE SHOOTING!';msg.textContent='Final score: '+score+'. Best score: '+best+'. Want another round?';start.textContent='PLAY AGAIN';overlay.classList.remove('hide')}
@@ -25,7 +25,7 @@ function drawCourt(){let g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#31
 // painted court texture
 for(let i=0;i<90;i++){x.fillStyle=i%2?'#ffffff08':'#f7a47b12';x.fillRect((i*137)%W,(i*71)%H,70,3)}
 x.strokeStyle='#ffe7cf';x.lineWidth=5;x.strokeRect(18,18,W-36,H-36);x.beginPath();x.moveTo(20,82);x.lineTo(880,82);x.moveTo(20,438);x.lineTo(880,438);x.stroke();
-x.fillStyle='#f16b43';x.fillRect(510,160,390,200);x.strokeStyle='#ffe7cf';x.lineWidth=5;x.strokeRect(510,160,390,200);x.beginPath();x.ellipse(510,260,145,145,0,-Math.PI/2,Math.PI/2);x.stroke();x.beginPath();x.arc(510,260,75,-Math.PI/2,Math.PI/2);x.setLineDash([12,10]);x.stroke();x.setLineDash([]);
+x.fillStyle='#f16b43';x.fillRect(515,160,385,200);x.strokeStyle='#ffe7cf';x.lineWidth=5;x.strokeRect(515,160,385,200);x.beginPath();x.ellipse(515,260,145,145,0,-Math.PI/2,Math.PI/2);x.stroke();x.beginPath();x.arc(515,260,75,-Math.PI/2,Math.PI/2);x.setLineDash([12,10]);x.stroke();x.setLineDash([]);
 }
 function drawHoop(){// backboard and rim
 x.fillStyle='#fff0df';x.fillRect(hoop.x+72,hoop.y-65,9,90);x.strokeStyle='#fff0df';x.lineWidth=5;x.strokeRect(hoop.x+35,hoop.y-65,48,35);
@@ -39,10 +39,10 @@ if(score>=20)x.fillStyle='#fff';if(score>=20){x.font='900 13px system-ui';x.fill
 function pointer(e){const r=c.getBoundingClientRect();return{x:(e.clientX-r.left)*W/r.width,y:(e.clientY-r.top)*H/r.height}}
 c.addEventListener('pointerdown',e=>{if(!active)return;let p=pointer(e);if(Math.hypot(p.x-ball.x,p.y-ball.y)<55){drag=true;aim=p;c.setPointerCapture(e.pointerId)}});
 c.addEventListener('pointermove',e=>{if(drag)aim=pointer(e)});
-c.addEventListener('pointerup',e=>{if(!drag)return;let p=pointer(e),dx=ball.x-p.x,dy=ball.y-p.y;drag=false;aim=null;if(dy>4){ball.vx=Math.max(260,Math.min(850,dx*3.1));ball.vy=-Math.max(380,Math.min(920,dy*3.3));shots++;scored=false}});
-function scoreBasket(){if(scored)return;scored=true;let points=streak>=3?2:1;score+=points;streak++;if(score>best){best=score;try{localStorage.setItem('gv-hoop-best',best)}catch(e){}}for(let i=0;i<18;i++)particles.push({x:hoop.x,y:hoop.y,vx:(Math.random()-.5)*220,vy:-Math.random()*220,life:.7});updateUI();ball.vx=ball.vy=0;ball.x=145;ball.y=ground-17}
-function miss(){streak=0;updateUI();ball.vx=ball.vy=0;ball.x=145;ball.y=ground-17}
-function loop(now){if(!active)return;let dt=Math.min((now-last)/1000,.03);last=now;let level=Math.floor(score/20);hoopSpeed=level?22+level*15:0;if(hoopSpeed){hoop.x+=hoop.dir*hoopSpeed*dt;if(hoop.x>760){hoop.x=760;hoop.dir=-1}if(hoop.x<570){hoop.x=570;hoop.dir=1}}
+c.addEventListener('pointerup',e=>{if(!drag)return;let p=pointer(e),dx=ball.x-p.x,dy=ball.y-p.y;drag=false;aim=null;const pull=Math.hypot(dx,dy);if(dy>8&&pull>12){const scale=Math.min(1,190/pull);const px=dx*scale,py=dy*scale;ball.vx=Math.max(260,Math.min(760,px*3.45));ball.vy=-Math.max(300,Math.min(780,py*3.45));shots++;scored=false}});
+function scoreBasket(){if(scored)return;scored=true;let points=streak>=3?2:1;score+=points;streak++;if(score>best){best=score;try{localStorage.setItem('gv-hoop-best',best)}catch(e){}}for(let i=0;i<18;i++)particles.push({x:hoop.x,y:hoop.y,vx:(Math.random()-.5)*220,vy:-Math.random()*220,life:.7});updateUI();ball.vx=ball.vy=0;ball.x=210;ball.y=ground-17}
+function miss(){streak=0;updateUI();ball.vx=ball.vy=0;ball.x=210;ball.y=ground-17}
+function loop(now){if(!active)return;let dt=Math.min((now-last)/1000,.03);last=now;let level=Math.floor(score/20);hoopSpeed=level?22+level*15:0;if(hoopSpeed){hoop.x+=hoop.dir*hoopSpeed*dt;if(hoop.x>790){hoop.x=790;hoop.dir=-1}if(hoop.x<650){hoop.x=650;hoop.dir=1}}
 if(ball.vx||ball.vy){let prevY=ball.y;ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;ball.vy+=900*dt;ball.vx*=.999;
 if(!scored&&ball.vy>0&&prevY<hoop.y&&ball.y>=hoop.y&&ball.x>hoop.x-35&&ball.x<hoop.x+35){scoreBasket()}
 if(ball.y>ground-ball.r||ball.x>W+40||ball.x<-40){miss()}}
