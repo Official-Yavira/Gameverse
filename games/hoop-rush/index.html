@@ -34,7 +34,7 @@ c.addEventListener('pointerdown',e=>{if(!active)return;let p=pointer(e);if(Math.
 c.addEventListener('pointermove',e=>{if(drag)aim=pointer(e)});
 c.addEventListener('pointerup',e=>{if(!drag)return;let p=pointer(e),dx=ball.x-p.x,dy=p.y-ball.y;drag=false;aim=null;if(dy>10&&Math.hypot(dx,dy)>14){const pull=Math.min(220,dy);ball.vx=Math.max(-360,Math.min(360,dx*1.55));ball.vy=-Math.max(850,Math.min(1120,760+pull*1.65));shots++;scored=false}});
 function scoreBasket(){if(scored)return;scored=true;let points=streak>=3?2:1;score+=points;streak++;if(score>best){best=score;try{localStorage.setItem('gv-hoop-best',best)}catch(e){}}for(let i=0;i<18;i++)particles.push({x:hoop.x,y:hoop.y,vx:(Math.random()-.5)*220,vy:-Math.random()*220,life:.7});updateUI();ball.vx=ball.vy=0;ball.x=450;ball.y=ground-18}
-function miss(){streak=0;updateUI();ball.vx=ball.vy=0;ball.x=450;ball.y=ground-18}
+function miss(){score=0;streak=0;updateUI();ball.vx=ball.vy=0;ball.x=450;ball.y=ground-18}
 function loop(now){if(!active)return;let dt=Math.min((now-last)/1000,.03);last=now;let level=Math.floor(score/5);hoopSpeed=level?8+level*7:0;if(hoopSpeed){hoop.x+=hoop.dir*hoopSpeed*dt;if(hoop.x>650){hoop.x=650;hoop.dir=-1}if(hoop.x<250){hoop.x=250;hoop.dir=1}}
 if(ball.vx||ball.vy){let prevY=ball.y,oldVy=ball.vy;ball.x+=ball.vx*dt;ball.y+=ball.vy*dt;ball.vy+=1250*dt;ball.vx*=.999;
 if(!scored&&oldVy>0&&prevY<hoop.y&&ball.y>=hoop.y&&ball.x>hoop.x-38&&ball.x<hoop.x+38){scoreBasket()}
