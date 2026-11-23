@@ -24,6 +24,15 @@ canvas{display:block;width:100%;height:auto;touch-action:manipulation}
 button{font:inherit;cursor:pointer}.primary{min-width:180px;border:0;background:#fff;color:#111;border-radius:5px;padding:15px 26px;font-size:12px;font-weight:950;letter-spacing:.13em;box-shadow:0 5px 0 #999,0 10px 28px #0008;transition:transform .16s ease,box-shadow .16s ease,background .16s ease;animation:startPulse 2.6s ease-in-out infinite}.primary:hover{background:#e7e7e7;transform:translateY(-2px);box-shadow:0 7px 0 #999,0 13px 30px #0009}.primary:active{transform:translateY(3px);box-shadow:0 2px 0 #999}@keyframes startPulse{0%,100%{box-shadow:0 5px 0 #999,0 10px 28px #0008}50%{box-shadow:0 5px 0 #999,0 10px 34px #ffffff25}}
 .help{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:14px 2px;color:#999;font-size:11px}.help b{color:#eee}.bottom{border-top:1px solid #2d2d2d;margin-top:22px;padding-top:16px;display:flex;justify-content:space-between;gap:12px;color:#777;font-size:10px}
 @media(max-width:560px){body{padding:14px}.scorebox{gap:6px}.scorebox>div{min-width:74px;padding:8px}.scorebox strong{font-size:17px}.dialog{padding:24px 20px}.help{font-size:10px}.bottom{font-size:9px}}@media(prefers-reduced-motion:reduce){.dialog,.primary{animation:none;transition:none}}
+
+/* GAMEVERSE start-screen polish */
+.overlay:not(.game-over) .dialog{border-color:#a5f3fc88;box-shadow:0 18px 70px #000b,0 0 34px #7c3aed35}
+.overlay:not(.game-over) .mini{color:#a5f3fc}
+.game-type{display:inline-flex;gap:8px;align-items:center;margin-top:10px;padding:5px 9px;border:1px solid #c4b5fd66;border-radius:99px;background:#312e8138;color:#e9d5ff;font-size:8px;font-weight:900;letter-spacing:.17em}
+.game-type span{color:#67e8f9}
+.overlay:not(.game-over) .dialog h2{background:linear-gradient(100deg,#fff 8%,#a5f3fc 52%,#d8b4fe 95%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.overlay:not(.game-over) .primary{background:linear-gradient(100deg,#a5f3fc,#c4b5fd 58%,#f0abfc);color:#111;box-shadow:0 5px 0 #7664a8,0 10px 30px #67e8f933}
+.overlay:not(.game-over) .primary:hover{background:linear-gradient(100deg,#cffafe,#ddd6fe 58%,#fae8ff);box-shadow:0 7px 0 #7664a8,0 13px 34px #67e8f955}
 </style>
 </head>
 <body>
@@ -32,7 +41,7 @@ button{font:inherit;cursor:pointer}.primary{min-width:180px;border:0;background:
   <div class="heading"><div><div class="kicker">GAMEVERSE ORIGINAL · 001</div><h1>BLACK RUNNER</h1></div><div class="scorebox"><div><span>SCORE</span><strong id="score">00000</strong></div><div><span>BEST</span><strong id="best">00000</strong></div></div></div>
   <section class="frame" aria-label="Project Runner game">
     <canvas id="game" width="900" height="420" aria-label="Runner game area"></canvas>
-    <div class="overlay" id="overlay"><div class="dialog"><div class="mini" id="stateLabel">READY PLAYER ONE</div><h2 id="overlayTitle">RUN YOUR OWN WAY.</h2><p id="overlayText">Jump over the blocks, keep moving and beat your best score. The longer you survive, the faster it gets.</p><button class="primary" id="start">START GAME</button></div></div>
+    <div class="overlay" id="overlay"><div class="dialog"><div class="mini" id="stateLabel">READY PLAYER ONE</div><div class="game-type">ARCADE <span>•</span> ENDLESS RUNNER</div><h2 id="overlayTitle">RUN YOUR OWN WAY.</h2><p id="overlayText">Jump over the blocks, keep moving and beat your best score. The longer you survive, the faster it gets.</p><button class="primary" id="start">START GAME</button></div></div>
   </section>
   <div class="help"><span><b>SPACE / ↑</b> or tap to jump</span><span><b>P</b> pause · <b>R</b> restart</span><span>One button. Endless challenge.</span></div>
   <footer class="bottom"><span>© GAMEVERSE · YOUR UNIVERSE. YOUR GAMES.</span><span>VERSION 0.1 · FIRST PLAYABLE BUILD</span></footer>
