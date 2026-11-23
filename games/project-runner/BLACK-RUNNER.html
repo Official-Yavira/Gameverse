@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#101010">
+<title>BLACK RUNNER — GAMEVERSE</title>
+<style>
+:root{color-scheme:dark;--bg:#101010;--panel:#191919;--line:#383838;--white:#f5f5f5;--muted:#a0a0a0}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:var(--bg);color:var(--white);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+body{display:grid;place-items:center;padding:22px}
+.shell{width:min(960px,100%)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+.brand{font-size:14px;font-weight:950;letter-spacing:.08em}.brand span{color:#777}
+.back{color:#bbb;text-decoration:none;font-size:12px;border:1px solid var(--line);padding:9px 12px;border-radius:5px}.back:hover{color:white;border-color:#777}
+.heading{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:0 0 14px}
+h1{font-size:clamp(28px,5vw,48px);letter-spacing:-.07em;line-height:1;margin:0}
+.kicker{font-size:10px;letter-spacing:.2em;color:#999;font-weight:800;margin-bottom:8px}
+.scorebox{display:flex;gap:18px;text-align:right}.scorebox span{display:block;color:#999;font-size:9px;letter-spacing:.13em}.scorebox strong{font-size:20px;font-variant-numeric:tabular-nums}
+.frame{position:relative;border:1px solid #454545;border-radius:10px;overflow:hidden;background:#f2f2f2;box-shadow:0 22px 70px #0008}
+canvas{display:block;width:100%;height:auto;touch-action:manipulation}
+.overlay{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(#05050580,#050505b8),url('../../assets/file_00000000bfa08210bcb3866a90b89515.png') center 42%/cover no-repeat;padding:20px;text-align:center}
+.overlay.hidden{display:none}.dialog{max-width:390px;padding:24px 28px;border:1px solid #ffffff55;border-radius:8px;background:#0808089c;backdrop-filter:blur(3px)}.dialog .mini{font-size:10px;letter-spacing:.2em;color:#aaa;font-weight:800}.dialog h2{font-size:clamp(28px,5vw,42px);letter-spacing:-.06em;margin:10px 0}.dialog p{color:#ccc;font-size:13px;line-height:1.6;margin:0 0 20px}
+button{font:inherit;cursor:pointer}.primary{border:0;background:white;color:#111;border-radius:5px;padding:13px 22px;font-size:11px;font-weight:900;letter-spacing:.08em}.primary:hover{background:#ddd}
+.help{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:14px 2px;color:#999;font-size:11px}.help b{color:#eee}.bottom{border-top:1px solid #2d2d2d;margin-top:22px;padding-top:16px;display:flex;justify-content:space-between;gap:12px;color:#777;font-size:10px}
+@media(max-width:560px){body{padding:14px}.scorebox{gap:10px}.scorebox strong{font-size:17px}.help{font-size:10px}.bottom{font-size:9px}}
+</style>
+</head>
+<body>
+<main class="shell">
+  <header class="top"><div class="brand">GAMEVERSE<span>.</span></div><a class="back" href="../../index.html#games">← BACK TO GAMEVERSE</a></header>
+  <div class="heading"><div><div class="kicker">GAMEVERSE ORIGINAL · 001</div><h1>BLACK RUNNER</h1></div><div class="scorebox"><div><span>SCORE</span><strong id="score">00000</strong></div><div><span>BEST</span><strong id="best">00000</strong></div></div></div>
+  <section class="frame" aria-label="Project Runner game">
+    <canvas id="game" width="900" height="420" aria-label="Runner game area"></canvas>
+    <div class="overlay" id="overlay"><div class="dialog"><div class="mini" id="stateLabel">READY PLAYER ONE</div><h2 id="overlayTitle">RUN YOUR OWN WAY.</h2><p id="overlayText">Jump over the blocks, keep moving and beat your best score. The longer you survive, the faster it gets.</p><button class="primary" id="start">START GAME</button></div></div>
+  </section>
+  <div class="help"><span><b>SPACE / ↑</b> or tap to jump</span><span><b>P</b> pause · <b>R</b> restart</span><span>One button. Endless challenge.</span></div>
+  <footer class="bottom"><span>© GAMEVERSE · YOUR UNIVERSE. YOUR GAMES.</span><span>VERSION 0.1 · FIRST PLAYABLE BUILD</span></footer>
+</main>
+<script>
+(()=>{
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+const scoreEl=document.getElementById('score'),bestEl=document.getElementById('best');
+const overlay=document.getElementById('overlay'),titleEl=document.getElementById('overlayTitle'),textEl=document.getElementById('overlayText'),labelEl=document.getElementById('stateLabel'),startBtn=document.getElementById('start');
+const W=900,H=420,ground=340;
+let state='ready',last=0,score=0,best=0,speed=390,spawn=0,obstacles=[],particles=[],distance=0;
+try{best=Number(localStorage.getItem('gv-runner-best')||0)}catch(e){}
+bestEl.textContent=String(best).padStart(5,'0');
+const player={x:115,y:ground-48,w:38,h:48,vy:0,onGround:true};
+function reset(){score=0;speed=390;spawn=.8;obstacles=[];particles=[];distance=0;player.y=ground-player.h;player.vy=0;player.onGround=true;scoreEl.textContent='00000'}
+function begin(){reset();state='running';overlay.classList.add('hidden');last=performance.now();requestAnimationFrame(loop)}
+function end(){state='over';if(score>best){best=score;bestEl.textContent=String(best).padStart(5,'0');try{localStorage.setItem('gv-runner-best',String(best))}catch(e){}}
+labelEl.textContent='RUN COMPLETE';titleEl.textContent='NICE RUN.';textEl.textContent='You scored '+score+'. Your best is '+best+'. Ready for another attempt?';startBtn.textContent='PLAY AGAIN';overlay.classList.remove('hidden')}
+function pause(){if(state==='running'){state='paused';labelEl.textContent='TAKE A BREATHER';titleEl.textContent='PAUSED';textEl.textContent='Your run is waiting. Jump back in when you are ready.';startBtn.textContent='RESUME';overlay.classList.remove('hidden')}else if(state==='paused'){state='running';overlay.classList.add('hidden');last=performance.now();requestAnimationFrame(loop)}}
+function jump(){if(state==='ready'||state==='over'){begin();return}if(state!=='running')return;if(player.onGround){player.vy=-760;player.onGround=false;for(let i=0;i<7;i++)particles.push({x:player.x+10,y:ground-4,vx:(Math.random()-.5)*150,vy:-Math.random()*130,life:.35})}}
+function addObstacle(){const tall=Math.random()>.55;const h=tall?68:42,w=tall?34:30;obstacles.push({x:W+20,y:ground-h,w,h})}
+function rect(x,y,w,h,color){ctx.fillStyle=color;ctx.fillRect(x,y,w,h)}
+function draw(){
+  ctx.clearRect(0,0,W,H);rect(0,0,W,H,'#f2f2f2');
+  ctx.fillStyle='#dedede';for(let x=0;x<W;x+=45){ctx.beginPath();ctx.arc(x+((distance*.12)%45),75+(x%3)*8,1.5,0,Math.PI*2);ctx.fill()}
+  rect(0,ground,W,2,'#111');rect(0,ground+2,W,H-ground,'#e5e5e5');
+  for(let x=-(distance%70);x<W;x+=70)rect(x,ground+24,34,3,'#c5c5c5');
+  // player shadow and character
+  ctx.fillStyle='#00000020';ctx.beginPath();ctx.ellipse(player.x+19,ground+5,25,5,0,0,Math.PI*2);ctx.fill();
+  rect(player.x,player.y,player.w,player.h,'#111');rect(player.x+7,player.y+9,8,8,'#fff');rect(player.x+23,player.y+9,8,8,'#fff');rect(player.x+10,player.y+12,3,4,'#111');rect(player.x+26,player.y+12,3,4,'#111');rect(player.x+12,player.y+31,17,4,'#fff');
+  for(const o of obstacles){rect(o.x,o.y,o.w,o.h,'#111');rect(o.x+6,o.y+7,5,5,'#fff')}
+  for(const p of particles){ctx.globalAlpha=Math.max(0,p.life/.35);rect(p.x,p.y,4,4,'#777')}ctx.globalAlpha=1;
+  ctx.fillStyle='#999';ctx.font='800 10px system-ui';ctx.letterSpacing='2px';ctx.fillText('KEEP MOVING',W-125,28);
+}
+function loop(now){if(state!=='running')return;const dt=Math.min((now-last)/1000,.032);last=now;distance+=speed*dt;speed=Math.min(720,390+score*1.15);spawn-=dt;
+  if(spawn<=0){addObstacle();spawn=Math.max(.62,1.35-Math.random()*.35-score/1800)}
+  player.vy+=1900*dt;player.y+=player.vy*dt;if(player.y>=ground-player.h){player.y=ground-player.h;player.vy=0;player.onGround=true}
+  obstacles.forEach(o=>o.x-=speed*dt);obstacles=obstacles.filter(o=>o.x+o.w>-10);
+  particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=500*dt;p.life-=dt});particles=particles.filter(p=>p.life>0);
+  for(const o of obstacles){if(player.x+player.w-7>o.x+4&&player.x+7<o.x+o.w-4&&player.y+player.h-4>o.y+4){end();draw();return}}
+  score=Math.floor(distance/12);scoreEl.textContent=String(score).padStart(5,'0');draw();requestAnimationFrame(loop)}
+startBtn.addEventListener('click',()=>{if(state==='paused')pause();else begin()});
+window.addEventListener('keydown',e=>{if(['Space','ArrowUp'].includes(e.code)){e.preventDefault();jump()}if(e.code==='KeyP')pause();if(e.code==='KeyR')begin()});
+canvas.addEventListener('pointerdown',()=>jump());
+draw();
+})();
+</script>
+</body>
+</html>
