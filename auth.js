@@ -111,7 +111,7 @@ async function renderAccount(user) {
   const libraryMarkup = libraryError
     ? '<p class="gv-auth-sub">La libreria non è al momento disponibile. Riprova tra poco.</p>'
     : ownedGames.length
-      ? '<div class="gv-library-list">' + ownedGames.map(game => `<div class="gv-library-item"><div><strong>${safe(game.name)}</strong><span>${safe(game.genre)}</span></div>${game.downloadUrl ? `<a class="btn" href="${safe(game.downloadUrl)}" download>DOWNLOAD ↓</a>` : '<span class="gv-library-pending">Download in preparazione</span>'}</div>`).join("") + '</div>'
+      ? '<div class="gv-library-list">' + ownedGames.map(game => `<div class="gv-library-item"><div><strong>${safe(game.name)}</strong><span>${safe(game.genre)}</span></div>${game.type === "Premium" ? `<button class="btn" type="button" data-secure-download="${safe(game.id)}">DOWNLOAD ↓</button>` : game.downloadUrl ? `<a class="btn" href="${safe(game.downloadUrl)}" download>DOWNLOAD ↓</a>` : '<span class="gv-library-pending">Download in preparazione</span>'}</div>`).join("") + '</div>'
       : '<div class="gv-library-empty"><strong>YOUR COLLECTION STARTS HERE.</strong><p>I giochi che acquisterai saranno raccolti qui. Potrai tornare in questa sezione per scaricarli.</p><a class="btn light" href="#games" id="gv-explore-games">EXPLORE GAMES ↗</a></div>';
   formArea.innerHTML = `
     <div class="gv-account-mark">MY GAMEVERSE</div>
@@ -124,6 +124,23 @@ async function renderAccount(user) {
   document.getElementById("gv-signout").addEventListener("click", async () => {
     const { error } = await supabase.auth.signOut();
     if (error) message(error.message, true);
+  });
+  formArea.querySelectorAll("[data-secure-download]").forEach(button => {
+    button.addEventListener("click", async () => {
+      const gameId = button.dataset.secureDownload;
+      button.disabled = true;
+      button.textContent = "PREPARING…";
+      const { data, error } = await supabase.functions.invoke("create-game-download", {
+        body: { game_id: gameId }
+      });
+      button.disabled = false;
+      button.textContent = "DOWNLOAD ↓";
+      if (error || !data?.url) {
+        message(data?.error || error?.message || "Download non disponibile al momento.", true);
+        return;
+      }
+      window.location.assign(data.url);
+    });
   });
   const explore = document.getElementById("gv-explore-games");
   if (explore) explore.addEventListener("click", () => { hideModal(); });
