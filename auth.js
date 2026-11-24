@@ -103,18 +103,30 @@ async function submitAuth(event) {
   if (error) message(error.message, true);
 }
 async function renderAccount(user) {
-  const { data } = await supabase.from("profiles").select("username").eq("id", user.id).maybeSingle();
-  const username = data?.username || user.user_metadata?.username || "Player";
+  const { data: profile } = await supabase.from("profiles").select("username").eq("id", user.id).maybeSingle();
+  const username = profile?.username || user.user_metadata?.username || "Player";
+  const { data: entitlements, error: libraryError } = await supabase
+    .from("game_entitlements").select("game_id, granted_at").eq("user_id", user.id).order("granted_at", { ascending: false });
+  const ownedGames = (entitlements || []).map(item => GAMES.find(game => game.id === item.game_id)).filter(Boolean);
+  const libraryMarkup = libraryError
+    ? '<p class="gv-auth-sub">La libreria non è al momento disponibile. Riprova tra poco.</p>'
+    : ownedGames.length
+      ? '<div class="gv-library-list">' + ownedGames.map(game => `<div class="gv-library-item"><div><strong>${safe(game.name)}</strong><span>${safe(game.genre)}</span></div>${game.downloadUrl ? `<a class="btn" href="${safe(game.downloadUrl)}" download>DOWNLOAD ↓</a>` : '<span class="gv-library-pending">Download in preparazione</span>'}</div>`).join("") + '</div>'
+      : '<div class="gv-library-empty"><strong>YOUR COLLECTION STARTS HERE.</strong><p>I giochi che acquisterai saranno raccolti qui. Potrai tornare in questa sezione per scaricarli.</p><a class="btn light" href="#games" id="gv-explore-games">EXPLORE GAMES ↗</a></div>';
   formArea.innerHTML = `
     <div class="gv-account-mark">MY GAMEVERSE</div>
     <h2>Welcome, ${safe(username)}.</h2>
     <p class="gv-auth-sub">Hai effettuato l'accesso.</p>
     <div class="gv-account-details"><span>USERNAME</span><strong>${safe(username)}</strong><span>EMAIL</span><strong>${safe(user.email || "")}</strong></div>
+    <div class="gv-library-heading"><span>YOUR COLLECTION</span><strong>MY GAMES</strong></div>
+    ${libraryMarkup}
     <button class="btn gv-auth-submit" id="gv-signout" type="button">SIGN OUT</button>`;
   document.getElementById("gv-signout").addEventListener("click", async () => {
     const { error } = await supabase.auth.signOut();
     if (error) message(error.message, true);
   });
+  const explore = document.getElementById("gv-explore-games");
+  if (explore) explore.addEventListener("click", () => { hideModal(); });
 }
 async function renderPasswordUpdate() {
   showModal();
