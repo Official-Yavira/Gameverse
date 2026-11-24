@@ -167,6 +167,34 @@ openButton.addEventListener("click", async () => {
   if (user) await renderAccount(user);
   else renderAuth("login");
 });
+
+document.addEventListener("click", async event => {
+  const button = event.target.closest("[data-buy-game]");
+  if (!button) return;
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    showModal();
+    renderAuth("login");
+    message("Accedi al tuo account prima di acquistare un gioco.", true);
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = "OPENING CHECKOUT…";
+  const { data, error } = await supabase.functions.invoke("create-game-checkout", {
+    body: { game_id: button.dataset.buyGame }
+  });
+  if (error || !data?.url) {
+    button.disabled = false;
+    button.textContent = "BUY NOW →";
+    message(data?.error || "Checkout non ancora configurato. Riprova più tardi.", true);
+    return;
+  }
+  window.location.assign(data.url);
+});
+
+
 closeButton.addEventListener("click", hideModal);
 modal.addEventListener("click", event => { if (event.target === modal) hideModal(); });
 document.addEventListener("keydown", event => { if (event.key === "Escape") hideModal(); });
