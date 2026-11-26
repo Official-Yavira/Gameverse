@@ -177,6 +177,7 @@ function renderPurchaseConsent(gameId) {
     <div class="gv-account-mark">GAMEVERSE · SECURE CHECKOUT</div>
     <h2>One last step.</h2>
     <p class="gv-auth-sub">You're purchasing <strong>${safe(game.name)}</strong> for <strong>CHF 1.99</strong>. One-time payment, no subscription.</p>
+    <form id="gv-purchase-consent-form" class="gv-auth-form">
     <div class="gv-consent-summary">
       <strong>Billing address · Switzerland only</strong>
       <p>For the initial launch, GAMEVERSE accepts orders with a Swiss billing address only. Enter the address exactly as you use it for billing; Stripe will prefill it on the secure payment page.</p>
@@ -191,7 +192,6 @@ function renderPurchaseConsent(gameId) {
       <strong>Digital delivery</strong>
       <p>After Stripe confirms your payment, the game will appear in <strong>MY GAMES</strong>. Only then will the secure download button become available. No file is delivered before payment confirmation.</p>
     </div>
-    <form id="gv-purchase-consent-form" class="gv-auth-form">
       <label class="gv-consent-check">
         <input type="checkbox" name="terms" required>
         <span>I have read and agree to the <a href="terms.html" target="_blank" rel="noopener">Terms of Sale</a> and have read the <a href="privacy.html" target="_blank" rel="noopener">Privacy Notice</a> and <a href="refunds.html" target="_blank" rel="noopener">Refund Policy</a>.</span>
@@ -222,7 +222,7 @@ function renderPurchaseConsent(gameId) {
       return;
     }
     if (!values.get("terms") || !values.get("digital") || !values.get("switzerland")) {
-      message("Please tick both boxes to continue.", true);
+      message("Please tick all confirmations to continue.", true);
       return;
     }
     const submit = document.getElementById("gv-proceed-payment");
