@@ -211,9 +211,9 @@ function renderPurchaseConsent(gameId) {
         terms_accepted: true,
         immediate_delivery_consent: true,
         withdrawal_right_acknowledged: true,
-        terms_version: "terms-2026-11-26-v3",
-        privacy_version: "privacy-2026-11-26-v3",
-        refund_policy_version: "refunds-2026-11-26-v3"
+        terms_version: "terms-2026-11-26-v4",
+        privacy_version: "privacy-2026-11-26-v4",
+        refund_policy_version: "refunds-2026-11-26-v4"
       }
     });
     if (error || !data?.url) {
