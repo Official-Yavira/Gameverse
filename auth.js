@@ -178,6 +178,16 @@ function renderPurchaseConsent(gameId) {
     <h2>One last step.</h2>
     <p class="gv-auth-sub">You're purchasing <strong>${safe(game.name)}</strong> for <strong>CHF 1.99</strong>. One-time payment, no subscription.</p>
     <div class="gv-consent-summary">
+      <strong>Billing address · Switzerland only</strong>
+      <p>For the initial launch, GAMEVERSE accepts orders with a Swiss billing address only. Enter the address exactly as you use it for billing; Stripe will prefill it on the secure payment page.</p>
+    </div>
+    <label>Full name<input name="billing_name" type="text" maxlength="100" autocomplete="name" required placeholder="Your full name"></label>
+    <label>Street and house number<input name="billing_line1" type="text" maxlength="120" autocomplete="address-line1" required placeholder="Street and house number"></label>
+    <label>Address line 2 · optional<input name="billing_line2" type="text" maxlength="120" autocomplete="address-line2" placeholder="Apartment, floor, etc."></label>
+    <label>Swiss postal code<input name="billing_postal_code" type="text" inputmode="numeric" maxlength="4" pattern="[1-9][0-9]{3}" autocomplete="postal-code" required placeholder="6936"></label>
+    <label>City<input name="billing_city" type="text" maxlength="80" autocomplete="address-level2" required placeholder="City"></label>
+    <p class="gv-consent-note"><strong>Billing country: Switzerland (CH)</strong></p>
+    <div class="gv-consent-summary">
       <strong>Digital delivery</strong>
       <p>After Stripe confirms your payment, the game will appear in <strong>MY GAMES</strong>. Only then will the secure download button become available. No file is delivered before payment confirmation.</p>
     </div>
@@ -188,7 +198,7 @@ function renderPurchaseConsent(gameId) {
       </label>
       <label class="gv-consent-check">
         <input type="checkbox" name="switzerland" required>
-        <span>I confirm that I am purchasing from Switzerland and will provide a Swiss billing address at Stripe checkout.</span>
+        <span>I confirm that the billing address I entered is my actual billing address in Switzerland.</span>
       </label>
       <label class="gv-consent-check">
         <input type="checkbox" name="digital" required>
@@ -202,6 +212,15 @@ function renderPurchaseConsent(gameId) {
   form.addEventListener("submit", async event => {
     event.preventDefault();
     const values = new FormData(form);
+    const billingName = String(values.get("billing_name") || "").trim();
+    const billingLine1 = String(values.get("billing_line1") || "").trim();
+    const billingLine2 = String(values.get("billing_line2") || "").trim();
+    const billingPostalCode = String(values.get("billing_postal_code") || "").trim();
+    const billingCity = String(values.get("billing_city") || "").trim();
+    if (billingName.length < 2 || billingLine1.length < 3 || !/^[1-9][0-9]{3}$/.test(billingPostalCode) || billingCity.length < 2) {
+      message("Enter a valid Swiss billing name, street, 4-digit postal code and city.", true);
+      return;
+    }
     if (!values.get("terms") || !values.get("digital") || !values.get("switzerland")) {
       message("Please tick both boxes to continue.", true);
       return;
@@ -214,10 +233,18 @@ function renderPurchaseConsent(gameId) {
         game_id: gameId,
         terms_accepted: true,
         switzerland_confirmed: true,
+        billing_address: {
+          name: billingName,
+          line1: billingLine1,
+          line2: billingLine2,
+          postal_code: billingPostalCode,
+          city: billingCity,
+          country: "CH"
+        },
         immediate_delivery_consent: true,
         withdrawal_right_acknowledged: true,
-        terms_version: "terms-2026-11-26-v6",
-        privacy_version: "privacy-2026-11-26-v6",
+        terms_version: "terms-2026-11-26-v7",
+        privacy_version: "privacy-2026-11-26-v7",
         refund_policy_version: "refunds-2026-11-26-v6"
       }
     });
