@@ -187,6 +187,10 @@ function renderPurchaseConsent(gameId) {
         <span>I have read and agree to the <a href="terms.html" target="_blank" rel="noopener">Terms of Sale</a> and have read the <a href="privacy.html" target="_blank" rel="noopener">Privacy Notice</a> and <a href="refunds.html" target="_blank" rel="noopener">Refund Policy</a>.</span>
       </label>
       <label class="gv-consent-check">
+        <input type="checkbox" name="switzerland" required>
+        <span>I confirm that I am purchasing from Switzerland and will provide a Swiss billing address at Stripe checkout.</span>
+      </label>
+      <label class="gv-consent-check">
         <input type="checkbox" name="digital" required>
         <span>I expressly request that GAMEVERSE starts supplying this digital content immediately after payment, before the end of any applicable withdrawal period. I acknowledge that, where the law provides for this exception, I lose my right of withdrawal once digital supply begins.</span>
       </label>
@@ -198,7 +202,7 @@ function renderPurchaseConsent(gameId) {
   form.addEventListener("submit", async event => {
     event.preventDefault();
     const values = new FormData(form);
-    if (!values.get("terms") || !values.get("digital")) {
+    if (!values.get("terms") || !values.get("digital") || !values.get("switzerland")) {
       message("Please tick both boxes to continue.", true);
       return;
     }
@@ -209,11 +213,12 @@ function renderPurchaseConsent(gameId) {
       body: {
         game_id: gameId,
         terms_accepted: true,
+        switzerland_confirmed: true,
         immediate_delivery_consent: true,
         withdrawal_right_acknowledged: true,
-        terms_version: "terms-2026-11-26-v5",
-        privacy_version: "privacy-2026-11-26-v5",
-        refund_policy_version: "refunds-2026-11-26-v5"
+        terms_version: "terms-2026-11-26-v6",
+        privacy_version: "privacy-2026-11-26-v6",
+        refund_policy_version: "refunds-2026-11-26-v6"
       }
     });
     if (error || !data?.url) {
