@@ -13,7 +13,7 @@
 <div class="draft">PRE-LAUNCH DRAFT · PURCHASES ARE NOT OPEN</div>
 <div class="eyebrow">LEGAL</div>
 <h1>Privacy Notice</h1>
-<p>Draft version: 26 November 2026 · Document version: privacy-2026-11-26-v6</p>
+<p>Draft version: 26 November 2026 · Document version: privacy-2026-11-26-v7</p>
 <p>This draft describes the main data flows currently used by GAMEVERSE. It is not the final privacy notice. The controller identity, contact channel, retention periods and final processor/transfer details must be completed before paid orders open.</p>
 
 <div class="missing"><strong>Data controller · pre-launch</strong><br>Controller: <strong>Lorenzo Lisi</strong>, individual (natural person), operating under the GAMEVERSE brand. GAMEVERSE is not a separate incorporated company.<br>Postal contact address: <strong>Via Cantonale 85, 6936 Cademario, Switzerland</strong>.<br>Privacy contact: <strong>gameverse.ink@proton.me</strong>.<br><br>The contact details above are provided for privacy enquiries. This draft notice remains under pre-launch review.</div>
@@ -22,13 +22,14 @@
 <ul>
 <li>Account information: username, email address, account identifier and authentication/session information.</li>
 <li>Purchase and entitlement information: game purchased, Stripe Checkout session identifier, amount, currency and purchase date.</li>
+<li>Billing information: name and Swiss billing address (street, postal code and city) supplied before checkout and passed to Stripe to prefill and complete the payment. GAMEVERSE uses the country and postal-code format for the initial Switzerland-only sales check; the full address is processed by Stripe as the payment provider.</li>
 <li>Consent evidence: the account identifier, game identifier, timestamp, language/locale, consent choices and versions of the Terms, Privacy Notice and Refund Policy that were shown.</li>
 <li>Download operations: information needed to verify ownership and generate a short-lived secure download link.</li>
 </ul>
-<p>Payment card details are entered into Stripe Checkout. GAMEVERSE does not intend to store full card numbers or security codes in its own database.</p>
+<p>Payment card details and the billing address are processed by Stripe Checkout. GAMEVERSE does not intend to store full card numbers or security codes in its own database. The billing address is associated with the Stripe Customer record used to prefill Checkout; it is not added to the GAMEVERSE purchase database.</p>
 
 <h2>2. Why we use the data</h2>
-<p>We use this information to create and secure accounts, process purchases, confirm payment, provide access to purchased downloads, document legally required consent, prevent fraud and abuse, respond to support requests, and maintain accounting and transaction records where required by law. We do not describe this as marketing consent and do not use the purchase consent checkbox for newsletters.</p>
+<p>We use this information to create and secure accounts, process purchases, check whether the supplied billing address meets the initial Switzerland-only sales requirement, confirm payment, provide access to purchased downloads, document legally required consent, prevent fraud and abuse, respond to support requests, and maintain accounting and transaction records where required by law. We do not describe this as marketing consent and do not use the purchase consent checkbox for newsletters.</p>
 
 <h2>3. Service providers</h2>
 <p>GAMEVERSE currently uses Supabase for authentication, database and private file storage, and Stripe for payment checkout and payment processing. These providers process information to provide their services and under their applicable privacy/security terms. Stripe receives information required to process the payment. Supabase hosts the GAMEVERSE project in its EU West region. Further details about international processing and safeguards must be checked against the final provider agreements before launch.</p>
