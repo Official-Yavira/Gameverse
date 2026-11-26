@@ -254,3 +254,29 @@ supabase.auth.onAuthStateChange(async (event, session) => {
     renderAuth("login");
   }
 });
+
+(async () => {
+  const params = new URLSearchParams(window.location.search);
+  const paymentStatus = params.get("payment");
+  if (paymentStatus !== "success" && paymentStatus !== "cancelled") return;
+
+  showModal();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (user) {
+    await renderAccount(user);
+    if (paymentStatus === "success") {
+      message("Stripe has returned you to GAMEVERSE. Your library is updated only after the server verifies the payment. Refresh MY GAMES if the game does not appear yet.");
+    } else {
+      message("Checkout was cancelled. No purchase was completed.");
+    }
+  } else {
+    renderAuth("login");
+    message(paymentStatus === "success"
+      ? "Sign in to check your GAMEVERSE library. The game appears only after Stripe confirms payment."
+      : "Checkout was cancelled. No purchase was completed.");
+  }
+  params.delete("payment");
+  params.delete("session_id");
+  const cleanUrl = window.location.pathname + (params.toString() ? "?" + params.toString() : "") + window.location.hash;
+  window.history.replaceState({}, "", cleanUrl);
+})();
