@@ -168,6 +168,64 @@ openButton.addEventListener("click", async () => {
   else renderAuth("login");
 });
 
+function renderPurchaseConsent(gameId) {
+  const game = GAMES.find(item => item.id === gameId);
+  if (!game || gameId !== "swift-recess") return;
+  showModal();
+  message("");
+  formArea.innerHTML = `
+    <div class="gv-account-mark">GAMEVERSE · SECURE CHECKOUT</div>
+    <h2>One last step.</h2>
+    <p class="gv-auth-sub">You're purchasing <strong>${safe(game.name)}</strong> for <strong>CHF 1.99</strong>. One-time payment, no subscription.</p>
+    <div class="gv-consent-summary">
+      <strong>Digital delivery</strong>
+      <p>After Stripe confirms your payment, the game will appear in <strong>MY GAMES</strong>. Only then will the secure download button become available. No file is delivered before payment confirmation.</p>
+    </div>
+    <form id="gv-purchase-consent-form" class="gv-auth-form">
+      <label class="gv-consent-check">
+        <input type="checkbox" name="terms" required>
+        <span>I have read and agree to the <a href="terms.html" target="_blank" rel="noopener">Terms of Sale</a> and have read the <a href="privacy.html" target="_blank" rel="noopener">Privacy Notice</a> and <a href="refunds.html" target="_blank" rel="noopener">Refund Policy</a>.</span>
+      </label>
+      <label class="gv-consent-check">
+        <input type="checkbox" name="digital" required>
+        <span>I expressly request that GAMEVERSE starts supplying this digital content immediately after payment, before the end of any applicable withdrawal period. I acknowledge that, where the law provides for this exception, I lose my right of withdrawal once digital supply begins.</span>
+      </label>
+      <button class="btn gv-auth-submit" id="gv-proceed-payment" type="submit">CONTINUE TO PAYMENT · CHF 1.99 →</button>
+    </form>
+    <p class="gv-consent-note">You will be redirected to Stripe's secure payment page. Your library is updated only after Stripe confirms that the payment is complete.</p>
+  `;
+  const form = document.getElementById("gv-purchase-consent-form");
+  form.addEventListener("submit", async event => {
+    event.preventDefault();
+    const values = new FormData(form);
+    if (!values.get("terms") || !values.get("digital")) {
+      message("Please tick both boxes to continue.", true);
+      return;
+    }
+    const submit = document.getElementById("gv-proceed-payment");
+    submit.disabled = true;
+    submit.textContent = "PREPARING SECURE PAYMENT…";
+    const { data, error } = await supabase.functions.invoke("create-game-checkout", {
+      body: {
+        game_id: gameId,
+        terms_accepted: true,
+        immediate_delivery_consent: true,
+        withdrawal_right_acknowledged: true,
+        terms_version: "terms-2026-11-26-v1",
+        privacy_version: "privacy-2026-11-26-v1",
+        refund_policy_version: "refunds-2026-11-26-v1"
+      }
+    });
+    if (error || !data?.url) {
+      submit.disabled = false;
+      submit.textContent = "CONTINUE TO PAYMENT · CHF 1.99 →";
+      message(data?.error || "Checkout is not available at the moment. Please try again later.", true);
+      return;
+    }
+    window.location.assign(data.url);
+  });
+}
+
 document.addEventListener("click", async event => {
   const button = event.target.closest("[data-buy-game]");
   if (!button) return;
@@ -176,22 +234,10 @@ document.addEventListener("click", async event => {
   if (!user) {
     showModal();
     renderAuth("login");
-    message("Accedi al tuo account prima di acquistare un gioco.", true);
+    message("Sign in to your GAMEVERSE account before purchasing.", true);
     return;
   }
-
-  button.disabled = true;
-  button.textContent = "OPENING CHECKOUT…";
-  const { data, error } = await supabase.functions.invoke("create-game-checkout", {
-    body: { game_id: button.dataset.buyGame }
-  });
-  if (error || !data?.url) {
-    button.disabled = false;
-    button.textContent = "BUY NOW →";
-    message(data?.error || "Checkout non ancora configurato. Riprova più tardi.", true);
-    return;
-  }
-  window.location.assign(data.url);
+  renderPurchaseConsent(button.dataset.buyGame);
 });
 
 
