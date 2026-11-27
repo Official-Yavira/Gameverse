@@ -4,6 +4,7 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="GAMEVERSE — discover independent games. Play in your browser or download your next adventure.">
 <meta name="theme-color" content="#ffffff">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="google-adsense-account" content="ca-pub-9522856157873401">
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9522856157873401"
      crossorigin="anonymous"></script>
@@ -83,4 +84,4 @@ function toast(msg){const n=$("#notice");n.textContent=msg;n.classList.remove("h
 document.addEventListener("click",e=>{const nav=e.target.closest("[data-nav]");if(nav){e.preventDefault();location.hash=nav.dataset.nav;showPage(nav.dataset.nav);return;}const open=e.target.closest("[data-open]");if(open){openGame(open.dataset.open);return;}const f=e.target.closest("[data-filter]");if(f){activeFilter=f.dataset.filter;document.querySelectorAll("[data-filter]").forEach(x=>x.classList.toggle("active",x===f));render();return;}if(e.target.closest("#back")){location.hash="games";showPage("games");return;}if(e.target.closest("[data-soon]"))toast("This game is not available yet. Stay tuned!");});
 $("#search").addEventListener("input",render);window.addEventListener("hashchange",()=>{const id=location.hash.slice(1)||"home";if(["home","games","coming","about"].includes(id))showPage(id);});$("#year").textContent=new Date().getFullYear();render();const initial=location.hash.slice(1);if(["home","games","coming","about"].includes(initial))showPage(initial);
 </script>
-<script type="module" src="auth.js"></script>\n</body></html>
+<script type="module" src="auth.js?v=20261127-security-1"></script>\n</body></html>
