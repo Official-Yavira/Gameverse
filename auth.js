@@ -39,7 +39,7 @@ function renderAuth(mode = "login") {
     <form id="gv-auth-form" class="gv-auth-form">
       ${signup ? '<label>Username<input name="username" minlength="3" maxlength="20" pattern="[A-Za-z0-9_]+" autocomplete="username" placeholder="Il tuo username" required></label>' : ""}
       <label>Email<input name="email" type="email" autocomplete="email" placeholder="name@example.com" required></label>
-      <label>Password<input name="password" type="password" minlength="${signup ? 12 : 8}" autocomplete="${signup ? "new-password" : "current-password"}" placeholder="${signup ? "Almeno 12 caratteri" : "La tua password"}" required></label>
+      <label>Password<input name="password" type="password" minlength="8" autocomplete="${signup ? "new-password" : "current-password"}" placeholder="Almeno 8 caratteri" required></label>
       <button class="btn gv-auth-submit" type="submit">${signup ? "CREATE ACCOUNT" : "SIGN IN"} →</button>
     </form>
     ${!signup ? '<button class="gv-auth-text-button" id="gv-forgot" type="button">Hai dimenticato la password?</button>' : '<p class="gv-auth-footnote">Lo username deve contenere 3–20 caratteri: lettere, numeri o _.</p>'}
@@ -78,8 +78,8 @@ async function submitAuth(event) {
   const password = String(form.get("password"));
   const username = String(form.get("username") || "").trim();
   const signup = !!form.get("username");
-  if (signup && password.length < 12) {
-    message("Per un nuovo account usa una password di almeno 12 caratteri.", true);
+  if (signup && password.length < 8) {
+    message("La password deve contenere almeno 8 caratteri.", true);
     return;
   }
   const submit = event.currentTarget.querySelector("button[type=submit]");
@@ -154,14 +154,14 @@ async function renderPasswordUpdate() {
   formArea.innerHTML = `
     <h2>Choose a new password.</h2>
     <form id="gv-update-password" class="gv-auth-form">
-      <label>Nuova password<input name="password" type="password" minlength="12" required autocomplete="new-password" placeholder="Almeno 12 caratteri"></label>
+      <label>Nuova password<input name="password" type="password" minlength="8" required autocomplete="new-password" placeholder="Almeno 8 caratteri"></label>
       <button class="btn gv-auth-submit" type="submit">UPDATE PASSWORD →</button>
     </form>`;
   document.getElementById("gv-update-password").addEventListener("submit", async event => {
     event.preventDefault();
     const password = String(new FormData(event.currentTarget).get("password") || "");
-    if (password.length < 12) {
-      message("La nuova password deve contenere almeno 12 caratteri.", true);
+    if (password.length < 8) {
+      message("La nuova password deve contenere almeno 8 caratteri.", true);
       return;
     }
     const { error } = await supabase.auth.updateUser({ password });
