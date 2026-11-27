@@ -202,7 +202,7 @@ function renderPurchaseConsent(gameId) {
       </label>
       <label class="gv-consent-check">
         <input type="checkbox" name="digital" required>
-        <span>I expressly request that GAMEVERSE starts supplying this digital content immediately after payment, before the end of any applicable withdrawal period. I acknowledge that, where the law provides for this exception, I lose my right of withdrawal once digital supply begins.</span>
+        <span>I expressly request that GAMEVERSE makes the digital game available immediately after Stripe confirms my payment. I understand that this is a digital download and that mandatory rights relating to non-delivery or a product that does not conform to the contract remain unaffected.</span>
       </label>
       <button class="btn gv-auth-submit" id="gv-proceed-payment" type="submit">CONTINUE TO PAYMENT · CHF 1.99 →</button>
     </form>
@@ -242,10 +242,10 @@ function renderPurchaseConsent(gameId) {
           country: "CH"
         },
         immediate_delivery_consent: true,
-        withdrawal_right_acknowledged: true,
-        terms_version: "terms-2026-11-27-v8",
-        privacy_version: "privacy-2026-11-27-v8",
-        refund_policy_version: "refunds-2026-11-27-v7"
+        immediate_delivery_acknowledged: true,
+        terms_version: "terms-2026-11-27-v9",
+        privacy_version: "privacy-2026-11-27-v9",
+        refund_policy_version: "refunds-2026-11-27-v8"
       }
     });
     if (error || !data?.url) {
