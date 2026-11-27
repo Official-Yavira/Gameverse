@@ -1,0 +1,4 @@
+Contact: mailto:gameverse.ink@proton.me
+Preferred-Languages: it, en
+Canonical: https://gameverse.ink/.well-known/security.txt
+Expires: 2027-11-27T23:59:00.000Z
